@@ -1,107 +1,215 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>برنامج ضيوف الرحمن</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>منتدى العمرة والزيارة</title>
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600&display=swap" rel="stylesheet">
+  <!-- Bahij TheSans -->
+  <style>
+    @font-face {
+      font-family: 'Bahij TheSans';
+      src: url('https://cdn.jsdelivr.net/gh/Alkafrawy/fonts/Bahij_TheSansArabic-Bold.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+  </style>
 
-    <!-- Manifest & Web App Meta -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#006838">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+  <!-- QR Code Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    <!-- QR Code Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: 'Bahij TheSans', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f8f8;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('achievement-1.svg');
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #414042;
+      min-height: 100vh;
+    }
 
-    <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            text-align: center;
-            background-color: #fefefe;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #006838;
-            padding: 15px 0;
-            color: white;
-            font-size: 20px;
-        }
-        img.logo {
-            width: 100px;
-            margin: 20px auto 10px;
-            display: block;
-        }
-        h1 {
-            color: #006838;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        button {
-            margin-top: 10px;
-            padding: 12px 25px;
-            background-color: #B48C58;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background-color: #a07748;
-        }
-        video, #preview {
-            border: 4px solid #006838;
-            border-radius: 10px;
-            transform: scaleX(-1);
-            max-width: 100%;
-            height: auto;
-            margin-top: 10px;
-        }
-        #countdown {
-            font-size: 24px;
-            color: #B48C58;
-            margin-top: 10px;
-        }
-        #qrCode {
-            margin-top: 15px;
-            padding: 10px;
-            background: white;
-            display: inline-block;
-            border-radius: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-        }
-        #previewContainer {
-            display: none;
-            margin-top: 10px;
-        }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #006838;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            display: none;
-            margin: 10px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    header {
+      background-color: #007A53;
+      padding: 20px 0;
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    img.logo {
+      width: 120px;
+      margin: 20px auto;
+      display: block;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    h1 {
+      color: #007A53;
+      font-size: 28px;
+      margin-bottom: 20px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .welcome-text {
+      font-size: 18px;
+      margin-bottom: 30px;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    button {
+      margin: 10px 5px;
+      padding: 12px 25px;
+      background-color: #96712B;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background-color: #805f24;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    video, #preview {
+      border: 4px solid #007A53;
+      border-radius: 10px;
+      transform: scaleX(-1);
+      max-width: 100%;
+      height: auto;
+      margin: 20px auto;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #countdown {
+      font-size: 28px;
+      color: #96712B;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+
+    #qrCode {
+      margin: 20px auto;
+      padding: 15px;
+      background: white;
+      display: inline-block;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid #eee;
+    }
+
+    #previewContainer {
+      display: none;
+      margin-top: 20px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #007A53;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      display: none;
+      margin: 20px auto;
+    }
+
+    .instructions {
+      background-color: #f0f8f5;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-right: 4px solid #007A53;
+      text-align: right;
+    }
+
+    .instructions h3 {
+      color: #007A53;
+      margin-top: 0;
+    }
+
+    .instructions ol {
+      padding-right: 20px;
+      text-align: right;
+    }
+
+    .instructions li {
+      margin-bottom: 8px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        font-size: 20px;
+        padding: 15px 0;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .welcome-text {
+        font-size: 16px;
+      }
+      
+      button {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        منتدى العمرة والزيارة
-    </header>
+  <header>برنامج ضيوف الرحمن</header>
 
-    <img src="https://github.com/lamsa-101/TST926/blob/main/%D8%B6%D9%8A%D9%88%D9%81%20%D8%A7%D9%84%D8%B1%D8%AD%D9%85%D9%86.jpg?raw=true" alt="شعار المنتدى" class="logo">
-    <h1>مرحباً بزوار المنتدى</h1>
+  <div class="container">
+    <img src="https://github.com/lamsa-101/TST926/blob/main/colored2.png?raw=true" alt="شعار المنتدى" class="logo">
+    <h1>مرحبًا!</h1>
+    
+    <div class="welcome-text">
+      نرحب بكم في منتدى العمرة والزيارة، يمكنكم التقاط صورة تذكارية معنا والحصول على رمز QR لحفظها
+    </div>
+    
+    <div class="instructions">
+      <h3>طريقة الاستخدام:</h3>
+      <ol>
+        <li>اضغط على زر "التقاط الصورة"</li>
+        <li>انتظر العد التنازلي</li>
+        <li>يمكنك إعادة التصوير أو تأكيد الصورة</li>
+        <li>احصل على رمز QR لحفظ صورتك</li>
+      </ol>
+    </div>
 
     <video id="video" autoplay playsinline></video><br>
     <button id="capture">التقاط الصورة</button>
@@ -109,100 +217,136 @@
     <canvas id="canvas" style="display: none;"></canvas>
 
     <div id="previewContainer">
-        <img id="preview" alt="معاينة الصورة">
-        <br>
-        <button id="confirm">تأكيد الصورة وإخراج QR</button>
-        <button id="retry">إعادة التصوير</button>
+      <img id="preview" alt="معاينة الصورة"><br>
+      <button id="confirm">تأكيد الصورة وإخراج QR</button>
+      <button id="retry">إعادة التصوير</button>
     </div>
 
     <div class="loader" id="loader"></div>
     <div id="qrCode"></div>
+  </div>
 
-    <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const qrCodeDiv = document.getElementById('qrCode');
-        const countdownDiv = document.getElementById('countdown');
-        const previewContainer = document.getElementById('previewContainer');
-        const preview = document.getElementById('preview');
-        const loader = document.getElementById('loader');
-        let capturedBlob = null;
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const qrCodeDiv = document.getElementById('qrCode');
+    const countdownDiv = document.getElementById('countdown');
+    const previewContainer = document.getElementById('previewContainer');
+    const preview = document.getElementById('preview');
+    const loader = document.getElementById('loader');
+    let capturedBlob = null;
+    let stream = null;
 
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user' }
-                });
-                video.srcObject = stream;
-            } catch (error) {
-                alert('تعذر تشغيل الكاميرا');
-            }
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { 
+            facingMode: 'user',
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
+        video.srcObject = stream;
+      } catch (error) {
+        alert('تعذر تشغيل الكاميرا. يرجى التحقق من أذونات الكاميرا.');
+        console.error('Camera error:', error);
+      }
+    }
+
+    // Start camera when page loads
+    startCamera();
+
+    document.getElementById('capture').addEventListener('click', () => {
+      let countdown = 3;
+      countdownDiv.textContent = countdown;
+      countdownDiv.style.display = 'block';
+
+      const interval = setInterval(() => {
+        countdown--;
+        countdownDiv.textContent = countdown;
+
+        if (countdown === 0) {
+          clearInterval(interval);
+          countdownDiv.style.display = 'none';
+          captureImage();
         }
+      }, 1000);
+    });
 
-        startCamera();
+    function captureImage() {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.save();
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      ctx.restore();
+      
+      canvas.toBlob(blob => {
+        capturedBlob = blob;
+        preview.src = URL.createObjectURL(blob);
+        previewContainer.style.display = 'block';
+      }, 'image/jpeg', 0.9); // Use JPEG for better compression
+    }
 
-        document.getElementById('capture').addEventListener('click', () => {
-            let countdown = 3;
-            countdownDiv.textContent = countdown;
+    document.getElementById('confirm').addEventListener('click', () => {
+      if (capturedBlob) {
+        uploadImage(capturedBlob);
+      }
+    });
 
-            const interval = setInterval(() => {
-                countdown--;
-                countdownDiv.textContent = countdown;
+    document.getElementById('retry').addEventListener('click', () => {
+      previewContainer.style.display = 'none';
+      capturedBlob = null;
+    });
 
-                if (countdown === 0) {
-                    clearInterval(interval);
-                    countdownDiv.textContent = '';
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    ctx.save();
-                    ctx.translate(canvas.width, 0);
-                    ctx.scale(-1, 1);
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    ctx.restore();
-                    canvas.toBlob(blob => {
-                        capturedBlob = blob;
-                        preview.src = URL.createObjectURL(blob);
-                        previewContainer.style.display = 'block';
-                    }, 'image/png');
-                }
-            }, 1000);
+    async function uploadImage(blob) {
+      loader.style.display = 'block';
+      previewContainer.style.display = 'none';
+      const apiKey = "95ab95a221282c26b36ba6a6a1be6887";
+      const formData = new FormData();
+      formData.append("image", blob, "visitor_photo.jpg");
+
+      try {
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+          method: 'POST',
+          body: formData
         });
-
-        document.getElementById('confirm').addEventListener('click', () => {
-            if (capturedBlob) uploadImage(capturedBlob);
-        });
-
-        document.getElementById('retry').addEventListener('click', () => {
-            previewContainer.style.display = 'none';
-            capturedBlob = null;
-        });
-
-        async function uploadImage(blob) {
-            loader.style.display = 'block';
-            const apiKey = "95ab95a221282c26b36ba6a6a1be6887";
-            const formData = new FormData();
-            formData.append("image", blob, "image.png");
-
-            try {
-                const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-                loader.style.display = 'none';
-                if (data.success) {
-                    const imageUrl = data.data.url;
-                    qrCodeDiv.innerHTML = '';
-                    new QRCode(qrCodeDiv, { text: imageUrl, width: 128, height: 128 });
-                } else {
-                    alert('خطأ في رفع الصورة');
-                }
-            } catch (err) {
-                loader.style.display = 'none';
-                alert('حدث خطأ، تحقق من الاتصال');
-            }
+        
+        const data = await res.json();
+        loader.style.display = 'none';
+        
+        if (data.success) {
+          const imageUrl = data.data.url;
+          qrCodeDiv.innerHTML = '';
+          new QRCode(qrCodeDiv, { 
+            text: imageUrl, 
+            width: 150, 
+            height: 150,
+            colorDark: "#007A53",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+          
+          // Scroll to QR code
+          qrCodeDiv.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          alert('حدث خطأ أثناء رفع الصورة. يرجى المحاولة مرة أخرى.');
         }
-    </script>
+      } catch (err) {
+        loader.style.display = 'none';
+        alert('حدث خطأ في الاتصال بالإنترنت. يرجى التحقق من اتصالك والمحاولة مرة أخرى.');
+        console.error('Upload error:', err);
+      }
+    }
+
+    // Clean up camera stream when page is unloaded
+    window.addEventListener('beforeunload', () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    });
+  </script>
 </body>
 </html>
