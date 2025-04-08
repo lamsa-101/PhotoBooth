@@ -1,246 +1,202 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>تصوير و QR</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      background-color: #f8f1e4;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      padding: 20px;
-      text-align: center;
-    }
-
-    h1 {
-      color: brown;
-      font-size: 2rem;
-      margin-bottom: 10px;
-    }
-
-    .intro {
-      font-size: 1.5rem;
-      color: #5d3a00;
-      margin-bottom: 20px;
-    }
-
-    video, #preview {
-      border: 5px solid brown;
-      border-radius: 10px;
-      transform: scaleX(-1);
-      width: 100%;
-      max-width: 400px;
-      aspect-ratio: 3 / 4;
-    }
-
-    button {
-      font-size: 1.2rem;
-      margin-top: 12px;
-      padding: 14px 28px;
-      background-color: brown;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background-color: #8b5e3b;
-      transform: scale(1.05);
-    }
-
-    #countdown {
-      font-size: 32px;
-      color: brown;
-      margin-top: 10px;
-    }
-
-    #qrCode {
-      margin-top: 20px;
-      padding: 10px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    #previewContainer {
-      margin-top: 10px;
-    }
-
-    .loader {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid brown;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 10px auto;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    #copyLink {
-      display: block;
-      margin: 10px auto;
-      background-color: #4CAF50;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منتدى العمرة والزيارة</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            text-align: center;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #F9F6F1;
+            padding: 20px;
+        }
+        header img {
+            width: 120px;
+            margin-bottom: 10px;
+        }
+        header h1 {
+            color: #006838;
+            margin: 0;
+            font-size: 24px;
+        }
+        video, #preview {
+            border: 5px solid #B48C58;
+            border-radius: 10px;
+            transform: scaleX(-1);
+            max-width: 90%;
+            height: auto;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #B48C58;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #967046;
+            transform: scale(1.05);
+        }
+        #countdown {
+            font-size: 24px;
+            color: #006838;
+            margin-top: 10px;
+        }
+        #qrCode {
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            border: 2px solid #B48C58;
+        }
+        #previewContainer {
+            display: none;
+            margin-top: 10px;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #006838;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin: 10px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-  <h1>📸 صور تجربتك!</h1>
-  <div class="intro">مرحباً بزوار المنتدى</div>
+    <header>
+        <img src="https://i.ibb.co/SKfMgzn/colored2.png" alt="شعار المنتدى">
+        <h1>مرحباً بزوار المنتدى</h1>
+    </header>
 
-  <video id="video" autoplay playsinline></video>
-  <br />
-  <button id="capture">التقاط الصورة</button>
-  <button onclick="startCamera()">🔄 إعادة تشغيل الكاميرا</button>
-  <div id="countdown"></div>
-  <canvas id="canvas" class="hidden"></canvas>
+    <video id="video" autoplay playsinline></video>
+    <br>
+    <button id="capture">التقاط الصورة</button>
+    <div id="countdown"></div>
+    <canvas id="canvas" style="display: none;"></canvas>
+    
+    <div id="previewContainer">
+        <img id="preview" alt="معاينة الصورة">
+        <br>
+        <button id="confirm">تأكيد الصورة وإخراج QR</button>
+        <button id="retry">إعادة التصوير</button>
+    </div>
+    
+    <div id="qrCode"></div>
+    <div class="loader" id="loader"></div>
 
-  <div id="previewContainer" class="hidden">
-    <img id="preview" alt="معاينة الصورة">
-    <br />
-    <button id="confirm">تأكيد الصورة وإخراج QR</button>
-    <button id="retry">إعادة التصوير</button>
-  </div>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const qrCodeDiv = document.getElementById('qrCode');
+        const countdownDiv = document.getElementById('countdown');
+        const previewContainer = document.getElementById('previewContainer');
+        const preview = document.getElementById('preview');
+        const loader = document.getElementById('loader');
+        let capturedBlob = null;
 
-  <div id="qrCode"></div>
-  <button id="copyLink" class="hidden">📋 نسخ الرابط</button>
-  <div class="loader hidden" id="loader"></div>
-
-  <script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const countdownDiv = document.getElementById('countdown');
-    const previewContainer = document.getElementById('previewContainer');
-    const preview = document.getElementById('preview');
-    const qrCodeDiv = document.getElementById('qrCode');
-    const loader = document.getElementById('loader');
-    const copyButton = document.getElementById('copyLink');
-    let capturedBlob = null;
-    let imageUrl = "";
-
-    function hideElement(el) {
-      el.classList.add('hidden');
-    }
-
-    function showElement(el) {
-      el.classList.remove('hidden');
-    }
-
-    async function startCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user" }
-        });
-        video.srcObject = stream;
-        showElement(video);
-      } catch (err) {
-        alert("تعذر تشغيل الكاميرا. تأكد من الإعدادات.");
-      }
-    }
-
-    async function startCountdown(seconds) {
-      countdownDiv.textContent = seconds;
-      for (let i = seconds - 1; i >= 0; i--) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        countdownDiv.textContent = i === 0 ? '' : i;
-      }
-    }
-
-    function captureImage() {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.save();
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      ctx.restore();
-
-      canvas.toBlob(blob => {
-        capturedBlob = blob;
-        preview.src = URL.createObjectURL(blob);
-        showElement(previewContainer);
-        hideElement(video);
-      }, 'image/png');
-    }
-
-    document.getElementById('capture').addEventListener('click', async () => {
-      await startCountdown(5);
-      captureImage();
-    });
-
-    document.getElementById('retry').addEventListener('click', () => {
-      capturedBlob = null;
-      showElement(video);
-      hideElement(previewContainer);
-      qrCodeDiv.innerHTML = "";
-      hideElement(copyButton);
-    });
-
-    document.getElementById('confirm').addEventListener('click', () => {
-      if (capturedBlob) uploadImage(capturedBlob);
-    });
-
-    copyButton.addEventListener('click', () => {
-      if (imageUrl) {
-        navigator.clipboard.writeText(imageUrl);
-        alert("تم نسخ الرابط إلى الحافظة!");
-      }
-    });
-
-    async function uploadImage(blob) {
-      showElement(loader);
-      const formData = new FormData();
-      formData.append("image", blob, "image.png");
-
-      try {
-        const response = await fetch("https://api.imgbb.com/1/upload?key=95ab95a221282c26b36ba6a6a1be6887", {
-          method: "POST",
-          body: formData
-        });
-
-        const data = await response.json();
-        hideElement(loader);
-
-        if (data.success) {
-          imageUrl = data.data.url;
-          qrCodeDiv.innerHTML = "";
-          new QRCode(qrCodeDiv, { text: imageUrl, width: 128, height: 128 });
-          showElement(copyButton);
-        } else {
-          alert("فشل في رفع الصورة.");
+        async function startCamera() {
+            try {
+                const constraints = {
+                    video: {
+                        facingMode: "user",
+                        width: { ideal: window.innerWidth },
+                        height: { ideal: window.innerHeight }
+                    }
+                };
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+            } catch (err) {
+                console.error("خطأ في تشغيل الكاميرا", err);
+                alert("تعذر تشغيل الكاميرا. تأكد من السماح باستخدام الكاميرا في المتصفح وتحقق من إعدادات الأمان.");
+            }
         }
-      } catch (error) {
-        hideElement(loader);
-        alert("تعذر رفع الصورة. تحقق من الاتصال بالإنترنت.");
-      }
-    }
 
-    // بدء الكاميرا تلقائياً
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      startCamera();
-    } else {
-      alert("المتصفح لا يدعم الوصول إلى الكاميرا.");
-    }
-  </script>
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            startCamera();
+        } else {
+            alert("المتصفح لا يدعم الوصول إلى الكاميرا.");
+        }
+
+        document.getElementById('capture').addEventListener('click', () => {
+            let countdown = 5;
+            countdownDiv.textContent = countdown;
+            const interval = setInterval(() => {
+                countdown--;
+                countdownDiv.textContent = countdown;
+                if (countdown === 0) {
+                    clearInterval(interval);
+                    countdownDiv.textContent = '';
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.save();
+                    ctx.translate(canvas.width, 0);
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    ctx.restore();
+                    canvas.toBlob(blob => {
+                        capturedBlob = blob;
+                        preview.src = URL.createObjectURL(blob);
+                        previewContainer.style.display = 'block';
+                    }, 'image/png');
+                }
+            }, 1000);
+        });
+
+        document.getElementById('confirm').addEventListener('click', () => {
+            if (capturedBlob) uploadImage(capturedBlob);
+        });
+
+        document.getElementById('retry').addEventListener('click', () => {
+            previewContainer.style.display = 'none';
+            capturedBlob = null;
+        });
+
+        async function uploadImage(blob) {
+            loader.style.display = 'block';
+            const apiKey = "95ab95a221282c26b36ba6a6a1be6887";
+            const formData = new FormData();
+            formData.append("image", blob, "image.png");
+
+            try {
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+                loader.style.display = 'none';
+                if (data.success) {
+                    const imageUrl = data.data.url;
+                    qrCodeDiv.innerHTML = "";
+                    new QRCode(qrCodeDiv, { text: imageUrl, width: 128, height: 128 });
+                } else {
+                    alert("حدث خطأ أثناء رفع الصورة");
+                }
+            } catch (error) {
+                loader.style.display = 'none';
+                alert("تعذر رفع الصورة. تحقق من اتصال الإنترنت وImgBB API.");
+            }
+        }
+    </script>
 </body>
 </html>
