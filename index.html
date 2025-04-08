@@ -13,6 +13,9 @@
     <meta name="theme-color" content="#006838">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     <style>
         body {
             font-family: 'Cairo', sans-serif;
@@ -38,7 +41,7 @@
             margin-bottom: 10px;
         }
         button {
-            margin-top: 15px;
+            margin-top: 10px;
             padding: 12px 25px;
             background-color: #B48C58;
             color: white;
@@ -51,6 +54,45 @@
         button:hover {
             background-color: #a07748;
         }
+        video, #preview {
+            border: 4px solid #006838;
+            border-radius: 10px;
+            transform: scaleX(-1);
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+        }
+        #countdown {
+            font-size: 24px;
+            color: #B48C58;
+            margin-top: 10px;
+        }
+        #qrCode {
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        #previewContainer {
+            display: none;
+            margin-top: 10px;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #006838;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin: 10px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -58,11 +100,109 @@
         منتدى العمرة والزيارة
     </header>
 
-    <img src="https://github.com/lamsa-101/TST926/blob/main/colored2.png?raw=true" alt="شعار المنتدى" class="logo">
-
+    <img src="logo.png" alt="شعار المنتدى" class="logo">
     <h1>مرحباً بزوار المنتدى</h1>
 
-    <p>اضغط على الزر لبدء تجربة التصوير.</p>
-    <button onclick="alert('هنا تبدأ تجربة التصوير ✨')">ابدأ الآن</button>
+    <video id="video" autoplay playsinline></video><br>
+    <button id="capture">التقاط الصورة</button>
+    <div id="countdown"></div>
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <div id="previewContainer">
+        <img id="preview" alt="معاينة الصورة">
+        <br>
+        <button id="confirm">تأكيد الصورة وإخراج QR</button>
+        <button id="retry">إعادة التصوير</button>
+    </div>
+
+    <div class="loader" id="loader"></div>
+    <div id="qrCode"></div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const qrCodeDiv = document.getElementById('qrCode');
+        const countdownDiv = document.getElementById('countdown');
+        const previewContainer = document.getElementById('previewContainer');
+        const preview = document.getElementById('preview');
+        const loader = document.getElementById('loader');
+        let capturedBlob = null;
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user' }
+                });
+                video.srcObject = stream;
+            } catch (error) {
+                alert('تعذر تشغيل الكاميرا');
+            }
+        }
+
+        startCamera();
+
+        document.getElementById('capture').addEventListener('click', () => {
+            let countdown = 5;
+            countdownDiv.textContent = countdown;
+
+            const interval = setInterval(() => {
+                countdown--;
+                countdownDiv.textContent = countdown;
+
+                if (countdown === 0) {
+                    clearInterval(interval);
+                    countdownDiv.textContent = '';
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.save();
+                    ctx.translate(canvas.width, 0);
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    ctx.restore();
+                    canvas.toBlob(blob => {
+                        capturedBlob = blob;
+                        preview.src = URL.createObjectURL(blob);
+                        previewContainer.style.display = 'block';
+                    }, 'image/png');
+                }
+            }, 1000);
+        });
+
+        document.getElementById('confirm').addEventListener('click', () => {
+            if (capturedBlob) uploadImage(capturedBlob);
+        });
+
+        document.getElementById('retry').addEventListener('click', () => {
+            previewContainer.style.display = 'none';
+            capturedBlob = null;
+        });
+
+        async function uploadImage(blob) {
+            loader.style.display = 'block';
+            const apiKey = "95ab95a221282c26b36ba6a6a1be6887";  // API key from imgbb
+            const formData = new FormData();
+            formData.append("image", blob, "image.png");
+
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                loader.style.display = 'none';
+                if (data.success) {
+                    const imageUrl = data.data.url;
+                    qrCodeDiv.innerHTML = '';
+                    new QRCode(qrCodeDiv, { text: imageUrl, width: 128, height: 128 });
+                } else {
+                    alert('خطأ في رفع الصورة');
+                }
+            } catch (err) {
+                loader.style.display = 'none';
+                alert('حدث خطأ، تحقق من الاتصال');
+            }
+        }
+    </script>
 </body>
 </html>
