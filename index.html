@@ -5,15 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ضيوف الرحمن</title>
 
-  <!-- Cairo Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Bahij TheSans -->
+  <style>
+    @font-face {
+      font-family: 'Bahij TheSans';
+      src: url('https://cdn.jsdelivr.net/gh/Alkafrawy/fonts/Bahij_TheSansArabic-Bold.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+  </style>
 
   <!-- QR Code Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
     body {
-      font-family: 'Cairo', sans-serif;
+      font-family: 'Bahij TheSans', sans-serif;
       text-align: center;
       margin: 0;
       padding: 0;
@@ -183,3 +190,164 @@
     }
   </style>
 </head>
+<body>
+  <header>برنامج ضيوف الرحمن</header>
+
+  <div class="container">
+    <img src="https://github.com/lamsa-101/TST926/blob/main/%D8%B6%D9%8A%D9%88%D9%81%20%D8%A7%D9%84%D8%B1%D8%AD%D9%85%D9%86.jpg?raw=true" alt="شعار المنتدى" class="logo">
+    <h1>مرحبًا!</h1>
+    
+    <div class="welcome-text">
+      نرحب بكم في برنامج ضيوف الرحمن ، يمكنكم التقاط صورة تذكارية معنا والحصول على رمز QR لحفظها
+    </div>
+    
+    <div class="instructions">
+      <h3>طريقة الاستخدام:</h3>
+      <ol>
+        <li>اضغط على زر "التقاط الصورة"</li>
+        <li>انتظر العد التنازلي</li>
+        <li>يمكنك إعادة التصوير أو تأكيد الصورة</li>
+        <li>احصل على رمز QR لحفظ صورتك</li>
+      </ol>
+    </div>
+
+    <video id="video" autoplay playsinline></video><br>
+    <button id="capture">التقاط الصورة</button>
+    <div id="countdown"></div>
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <div id="previewContainer">
+      <img id="preview" alt="معاينة الصورة"><br>
+      <button id="confirm">تأكيد الصورة وإخراج QR</button>
+      <button id="retry">إعادة التصوير</button>
+    </div>
+
+    <div class="loader" id="loader"></div>
+    <div id="qrCode"></div>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const qrCodeDiv = document.getElementById('qrCode');
+    const countdownDiv = document.getElementById('countdown');
+    const previewContainer = document.getElementById('previewContainer');
+    const preview = document.getElementById('preview');
+    const loader = document.getElementById('loader');
+    let capturedBlob = null;
+    let stream = null;
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { 
+            facingMode: 'user',
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
+        video.srcObject = stream;
+      } catch (error) {
+        alert('تعذر تشغيل الكاميرا. يرجى التحقق من أذونات الكاميرا.');
+        console.error('Camera error:', error);
+      }
+    }
+
+    // Start camera when page loads
+    startCamera();
+
+    document.getElementById('capture').addEventListener('click', () => {
+      let countdown = 3;
+      countdownDiv.textContent = countdown;
+      countdownDiv.style.display = 'block';
+
+      const interval = setInterval(() => {
+        countdown--;
+        countdownDiv.textContent = countdown;
+
+        if (countdown === 0) {
+          clearInterval(interval);
+          countdownDiv.style.display = 'none';
+          captureImage();
+        }
+      }, 1000);
+    });
+
+    function captureImage() {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.save();
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      ctx.restore();
+      
+      canvas.toBlob(blob => {
+        capturedBlob = blob;
+        preview.src = URL.createObjectURL(blob);
+        previewContainer.style.display = 'block';
+      }, 'image/jpeg', 0.9); // Use JPEG for better compression
+    }
+
+    document.getElementById('confirm').addEventListener('click', () => {
+      if (capturedBlob) {
+        uploadImage(capturedBlob);
+      }
+    });
+
+    document.getElementById('retry').addEventListener('click', () => {
+      previewContainer.style.display = 'none';
+      capturedBlob = null;
+    });
+
+    async function uploadImage(blob) {
+      loader.style.display = 'block';
+      previewContainer.style.display = 'none';
+      const apiKey = "95ab95a221282c26b36ba6a6a1be6887";
+      const formData = new FormData();
+      formData.append("image", blob, "visitor_photo.jpg");
+
+      try {
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await res.json();
+        loader.style.display = 'none';
+        
+        if (data.success) {
+          const imageUrl = data.data.url;
+          qrCodeDiv.innerHTML = '';
+          new QRCode(qrCodeDiv, { 
+            text: imageUrl, 
+            width: 150, 
+            height: 150,
+            colorDark: "#007A53",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+          
+          // Scroll to QR code
+          qrCodeDiv.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          alert('حدث خطأ أثناء رفع الصورة. يرجى المحاولة مرة أخرى.');
+        }
+      } catch (err) {
+        loader.style.display = 'none';
+        alert('حدث خطأ في الاتصال بالإنترنت. يرجى التحقق من اتصالك والمحاولة مرة أخرى.');
+        console.error('Upload error:', err);
+      }
+    }
+
+    // Clean up camera stream when page is unloaded
+    window.addEventListener('beforeunload', () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    });
+  </script>
+</body>
+</html>   
+
