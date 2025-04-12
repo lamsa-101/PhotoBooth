@@ -53,15 +53,11 @@
       top: 15px;
     }
 
-    .theme-toggle, .camera-toggle {
+    .camera-toggle {
       position: absolute;
       right: 15px;
       top: 15px;
       margin-left: 10px;
-    }
-
-    .camera-toggle {
-      right: 60px;
     }
 
     .container {
@@ -223,7 +219,6 @@
   <header>
     برنامج ضيوف الرحمن
     <button class="lang-switch" onclick="toggleLanguage()">EN</button>
-    <button class="theme-toggle" onclick="toggleDarkMode()">🌙</button>
     <button class="camera-toggle" onclick="switchCamera()">🔁</button>
   </header>
 
@@ -297,10 +292,6 @@
     function switchCamera() {
       usingFrontCamera = !usingFrontCamera;
       startCamera();
-    }
-
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
     }
 
     function toggleLanguage() {
