@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ضيوف الرحمن</title>
 
-  <!-- Bahij TheSans -->
   <style>
     @font-face {
       font-family: 'Bahij TheSans';
@@ -15,7 +14,6 @@
     }
   </style>
 
-  <!-- QR Code Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
@@ -32,6 +30,12 @@
       background-attachment: fixed;
       color: #414042;
       min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.dark-mode {
+      background-color: #222;
+      color: #f1f1f1;
     }
 
     header {
@@ -40,12 +44,60 @@
       color: white;
       font-size: 24px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .lang-switch {
+      position: absolute;
+      left: 15px;
+      top: 15px;
+    }
+
+    .theme-toggle, .camera-toggle {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      margin-left: 10px;
+    }
+
+    .camera-toggle {
+      right: 60px;
     }
 
     .container {
       max-width: 800px;
       margin: 0 auto;
       padding: 20px;
+    }
+
+    .header-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .instructions {
+      background-color: #f0f8f5;
+      padding: 15px;
+      border-radius: 8px;
+      border-right: 4px solid #007A53;
+      text-align: right;
+      max-width: 300px;
+    }
+
+    .instructions h3 {
+      color: #007A53;
+      margin-top: 0;
+    }
+
+    .instructions ol {
+      padding-right: 20px;
+      text-align: right;
+    }
+
+    .instructions li {
+      margin-bottom: 8px;
     }
 
     img.logo {
@@ -136,29 +188,6 @@
       margin: 20px auto;
     }
 
-    .instructions {
-      background-color: #f0f8f5;
-      padding: 15px;
-      border-radius: 8px;
-      margin: 20px 0;
-      border-right: 4px solid #007A53;
-      text-align: right;
-    }
-
-    .instructions h3 {
-      color: #007A53;
-      margin-top: 0;
-    }
-
-    .instructions ol {
-      padding-right: 20px;
-      text-align: right;
-    }
-
-    .instructions li {
-      margin-bottom: 8px;
-    }
-
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
@@ -174,15 +203,15 @@
         font-size: 20px;
         padding: 15px 0;
       }
-      
+
       h1 {
         font-size: 24px;
       }
-      
+
       .welcome-text {
         font-size: 16px;
       }
-      
+
       button {
         padding: 10px 20px;
         font-size: 14px;
@@ -191,24 +220,31 @@
   </style>
 </head>
 <body>
-  <header>برنامج ضيوف الرحمن</header>
+  <header>
+    برنامج ضيوف الرحمن
+    <button class="lang-switch" onclick="toggleLanguage()">EN</button>
+    <button class="theme-toggle" onclick="toggleDarkMode()">🌙</button>
+    <button class="camera-toggle" onclick="switchCamera()">🔁</button>
+  </header>
 
   <div class="container">
-    <img src="https://github.com/lamsa-101/TST926/blob/main/%D8%B6%D9%8A%D9%88%D9%81%20%D8%A7%D9%84%D8%B1%D8%AD%D9%85%D9%86.jpg?raw=true" alt="شعار المنتدى" class="logo">
+    <div class="header-wrapper">
+      <div class="instructions">
+        <h3>طريقة الاستخدام:</h3>
+        <ol>
+          <li>اضغط على زر "التقاط الصورة"</li>
+          <li>انتظر العد التنازلي</li>
+          <li>يمكنك إعادة التصوير أو تأكيد الصورة</li>
+          <li>احصل على رمز QR لحفظ صورتك</li>
+        </ol>
+      </div>
+      <img src="https://github.com/lamsa-101/TST926/blob/main/%D8%B6%D9%8A%D9%88%D9%81%20%D8%A7%D9%84%D8%B1%D8%AD%D9%85%D9%86.jpg?raw=true" alt="شعار المنتدى" class="logo">
+    </div>
+
     <h1>مرحبًا!</h1>
-    
+
     <div class="welcome-text">
       نرحب بكم في برنامج ضيوف الرحمن ، يمكنكم التقاط صورة تذكارية معنا والحصول على رمز QR لحفظها
-    </div>
-    
-    <div class="instructions">
-      <h3>طريقة الاستخدام:</h3>
-      <ol>
-        <li>اضغط على زر "التقاط الصورة"</li>
-        <li>انتظر العد التنازلي</li>
-        <li>يمكنك إعادة التصوير أو تأكيد الصورة</li>
-        <li>احصل على رمز QR لحفظ صورتك</li>
-      </ol>
     </div>
 
     <video id="video" autoplay playsinline></video><br>
@@ -237,24 +273,41 @@
     const loader = document.getElementById('loader');
     let capturedBlob = null;
     let stream = null;
+    let usingFrontCamera = true;
 
     async function startCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
       try {
         stream = await navigator.mediaDevices.getUserMedia({
-          video: { 
-            facingMode: 'user',
+          video: {
+            facingMode: usingFrontCamera ? 'user' : 'environment',
             width: { ideal: 1280 },
             height: { ideal: 720 }
           }
         });
         video.srcObject = stream;
       } catch (error) {
-        alert('تعذر تشغيل الكاميرا. يرجى التحقق من أذونات الكاميرا.');
+        alert('تعذر تشغيل الكاميرا. يرجى التحقق من الأذونات.');
         console.error('Camera error:', error);
       }
     }
 
-    // Start camera when page loads
+    function switchCamera() {
+      usingFrontCamera = !usingFrontCamera;
+      startCamera();
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    function toggleLanguage() {
+      // يمكن إضافة دعم اللغة هنا لاحقًا
+      alert('دعم اللغة الإنجليزية قريباً!');
+    }
+
     startCamera();
 
     document.getElementById('capture').addEventListener('click', () => {
@@ -282,12 +335,12 @@
       ctx.scale(-1, 1);
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       ctx.restore();
-      
+
       canvas.toBlob(blob => {
         capturedBlob = blob;
         preview.src = URL.createObjectURL(blob);
         previewContainer.style.display = 'block';
-      }, 'image/jpeg', 0.9); // Use JPEG for better compression
+      }, 'image/jpeg', 0.9);
     }
 
     document.getElementById('confirm').addEventListener('click', () => {
@@ -313,35 +366,33 @@
           method: 'POST',
           body: formData
         });
-        
+
         const data = await res.json();
         loader.style.display = 'none';
-        
+
         if (data.success) {
           const imageUrl = data.data.url;
           qrCodeDiv.innerHTML = '';
-          new QRCode(qrCodeDiv, { 
-            text: imageUrl, 
-            width: 150, 
+          new QRCode(qrCodeDiv, {
+            text: imageUrl,
+            width: 150,
             height: 150,
             colorDark: "#007A53",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H
           });
-          
-          // Scroll to QR code
+
           qrCodeDiv.scrollIntoView({ behavior: 'smooth' });
         } else {
-          alert('حدث خطأ أثناء رفع الصورة. يرجى المحاولة مرة أخرى.');
+          alert('حدث خطأ أثناء رفع الصورة.');
         }
       } catch (err) {
         loader.style.display = 'none';
-        alert('حدث خطأ في الاتصال بالإنترنت. يرجى التحقق من اتصالك والمحاولة مرة أخرى.');
+        alert('خطأ في الاتصال.');
         console.error('Upload error:', err);
       }
     }
 
-    // Clean up camera stream when page is unloaded
     window.addEventListener('beforeunload', () => {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -349,5 +400,4 @@
     });
   </script>
 </body>
-</html>   
-
+</html>
