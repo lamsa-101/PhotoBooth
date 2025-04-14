@@ -1,5 +1,4 @@
-سويها بس على هذا الكود 
-
+<!-- كامل الملف محدث، فيه رفع الصور على File.io برابط مؤقت -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -11,8 +10,6 @@
     @font-face {
       font-family: 'Bahij TheSans';
       src: url('https://cdn.jsdelivr.net/gh/Alkafrawy/fonts/Bahij_TheSansArabic-Bold.ttf') format('truetype');
-      font-weight: normal;
-      font-style: normal;
     }
   </style>
 
@@ -32,12 +29,6 @@
       background-attachment: fixed;
       color: #414042;
       min-height: 100vh;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    body.dark-mode {
-      background-color: #222;
-      color: #f1f1f1;
     }
 
     header {
@@ -49,30 +40,19 @@
       position: relative;
     }
 
-    .lang-switch {
+    .lang-switch, .camera-toggle {
       position: absolute;
-      left: 15px;
       top: 15px;
+      padding: 6px 12px;
     }
 
-    .camera-toggle {
-      position: absolute;
-      right: 15px;
-      top: 15px;
-      margin-left: 10px;
-    }
+    .lang-switch { left: 15px; }
+    .camera-toggle { right: 15px; }
 
     .container {
       max-width: 800px;
       margin: 0 auto;
       padding: 20px;
-    }
-
-    .header-wrapper {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
     }
 
     .instructions {
@@ -84,39 +64,26 @@
       max-width: 300px;
     }
 
-    .instructions h3 {
-      color: #007A53;
-      margin-top: 0;
-    }
+    .instructions h3 { color: #007A53; margin-top: 0; }
 
-    .instructions ol {
-      padding-right: 20px;
-      text-align: right;
-    }
+    .instructions ol { padding-right: 20px; }
 
-    .instructions li {
-      margin-bottom: 8px;
-    }
-
-    img.logo {
+    .logo {
       width: 360px;
       margin: 20px auto;
       display: block;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     }
 
     h1 {
       color: #007A53;
       font-size: 28px;
       margin-bottom: 20px;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
 
     .welcome-text {
       font-size: 18px;
       margin-bottom: 30px;
       color: #555;
-      line-height: 1.6;
     }
 
     button {
@@ -128,19 +95,9 @@
       border-radius: 6px;
       font-size: 16px;
       cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    button:hover {
-      background-color: #805f24;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
+    button:hover { background-color: #805f24; }
 
     video, #preview {
       border: 4px solid #007A53;
@@ -149,7 +106,6 @@
       max-width: 100%;
       height: auto;
       margin: 20px auto;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     #countdown {
@@ -165,14 +121,12 @@
       background: white;
       display: inline-block;
       border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       border: 1px solid #eee;
     }
 
     #previewContainer {
       display: none;
       margin-top: 20px;
-      animation: fadeIn 0.5s ease;
     }
 
     .loader {
@@ -190,31 +144,6 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @media (max-width: 600px) {
-      header {
-        font-size: 20px;
-        padding: 15px 0;
-      }
-
-      h1 {
-        font-size: 24px;
-      }
-
-      .welcome-text {
-        font-size: 16px;
-      }
-
-      button {
-        padding: 10px 20px;
-        font-size: 14px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -225,7 +154,7 @@
   </header>
 
   <div class="container">
-    <div class="header-wrapper">
+    <div class="header-wrapper" style="display: flex; justify-content: space-between; flex-wrap: wrap;">
       <div class="instructions">
         <h3>طريقة الاستخدام:</h3>
         <ol>
@@ -240,9 +169,7 @@
 
     <h1>مرحبًا!</h1>
 
-    <div class="welcome-text">
-      نرحب بكم في برنامج ضيوف الرحمن ، يمكنكم التقاط صورة تذكارية معنا والحصول على رمز QR لحفظها
-    </div>
+    <div class="welcome-text">نرحب بكم في برنامج ضيوف الرحمن، يمكنكم التقاط صورة تذكارية معنا والحصول على رمز QR لحفظها</div>
 
     <video id="video" autoplay playsinline></video><br>
     <button id="capture">التقاط الصورة</button>
@@ -273,21 +200,14 @@
     let usingFrontCamera = true;
 
     async function startCamera() {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
+      if (stream) stream.getTracks().forEach(track => track.stop());
       try {
         stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: usingFrontCamera ? 'user' : 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
+          video: { facingMode: usingFrontCamera ? 'user' : 'environment' }
         });
         video.srcObject = stream;
       } catch (error) {
         alert('تعذر تشغيل الكاميرا. يرجى التحقق من الأذونات.');
-        console.error('Camera error:', error);
       }
     }
 
@@ -297,7 +217,6 @@
     }
 
     function toggleLanguage() {
-      // يمكن إضافة دعم اللغة هنا لاحقًا
       alert('دعم اللغة الإنجليزية قريباً!');
     }
 
@@ -337,9 +256,7 @@
     }
 
     document.getElementById('confirm').addEventListener('click', () => {
-      if (capturedBlob) {
-        uploadImage(capturedBlob);
-      }
+      if (capturedBlob) uploadImage(capturedBlob);
     });
 
     document.getElementById('retry').addEventListener('click', () => {
@@ -350,13 +267,13 @@
     async function uploadImage(blob) {
       loader.style.display = 'block';
       previewContainer.style.display = 'none';
-      const apiKey = "95ab95a221282c26b36ba6a6a1be6887";
+
       const formData = new FormData();
-      formData.append("image", blob, "visitor_photo.jpg");
+      formData.append("file", blob, "visitor_photo.jpg");
 
       try {
-        const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
-          method: 'POST',
+        const res = await fetch("https://file.io/?expires=1d", {
+          method: "POST",
           body: formData
         });
 
@@ -364,7 +281,7 @@
         loader.style.display = 'none';
 
         if (data.success) {
-          const imageUrl = data.data.url;
+          const imageUrl = data.link;
           qrCodeDiv.innerHTML = '';
           new QRCode(qrCodeDiv, {
             text: imageUrl,
@@ -377,19 +294,16 @@
 
           qrCodeDiv.scrollIntoView({ behavior: 'smooth' });
         } else {
-          alert('حدث خطأ أثناء رفع الصورة.');
+          alert("فشل في رفع الصورة.");
         }
       } catch (err) {
         loader.style.display = 'none';
-        alert('خطأ في الاتصال.');
-        console.error('Upload error:', err);
+        alert('تعذر رفع الصورة حالياً.');
       }
     }
 
     window.addEventListener('beforeunload', () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
+      if (stream) stream.getTracks().forEach(track => track.stop());
     });
   </script>
 </body>
